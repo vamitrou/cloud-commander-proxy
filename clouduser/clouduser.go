@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func usage() {
+func Usage() {
 	fmt.Println("usage: clouduser <command> [<args>]")
 	fmt.Println("examples:")
 	fmt.Println("clouduser make janedoe")
@@ -16,45 +16,65 @@ func usage() {
 	fmt.Println("clouduser delete janedoe")
 }
 
+func Make(username string) {
+	access_key, err := insertUser(username)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(username, access_key)
+}
+
+func Show(username string) {
+	user, err := getUser(username)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(user)
+}
+
+func Delete(username string) {
+	err := deleteUser(username)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("User deleted.")
+}
+
+func Suspend(username string) {
+	fmt.Println("suspend")
+}
+
+func Enable(username string) {
+	fmt.Println("enable")
+}
+
 func main() {
 	if len(os.Args) < 3 {
-		usage()
-		return
+		Usage()
+		os.Exit(1)
 	}
 	username := os.Args[2]
 
 	switch os.Args[1] {
 	case "make":
-		access_key, err := insertUser(username)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		fmt.Println(username, access_key)
-		return
+		Make(username)
+		os.Exit(0)
 	case "show":
-		user, err := getUser(username)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		fmt.Println(user)
-		return
+		Show(username)
+		os.Exit(0)
 	case "delete":
-		err := deleteUser(username)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		fmt.Println("User deleted.")
-		return
+		Delete(username)
+		os.Exit(0)
 	case "suspend":
-		fmt.Println("suspend")
-		return
+		Suspend(username)
+		os.Exit(0)
 	case "enable":
-		fmt.Println("enable")
-		return
+		Enable(username)
+		os.Exit(0)
 	}
-	usage()
-	return
+	Usage()
+	os.Exit(1)
 }
