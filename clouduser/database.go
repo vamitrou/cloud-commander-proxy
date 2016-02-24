@@ -105,6 +105,45 @@ func deleteUser(username string) error {
 	return nil
 }
 
+func setActive(username string, active int) error {
+	db, err := _getDBObject()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	stmt, err := db.Prepare("update user set active = ? where name = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(active, username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func renewUserKey(username string) (string, error) {
+	db, err := _getDBObject()
+	if err != nil {
+		return "", err
+	}
+	defer db.Close()
+	stmt, err := db.Prepare("update user set access_key = ? where name = ?")
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+
+	access_key := uuid.New()
+	_, err = stmt.Exec(access_key, username)
+	if err != nil {
+		return "", err
+	}
+	return access_key, nil
+}
+
 func unpackUser(row *sql.Row, user *User) error {
 	err := row.Scan(&user.Id, &user.Name, &user.AccessKey, &user.Active, &user.LastModified, &user.LastUsed)
 	if err != nil {

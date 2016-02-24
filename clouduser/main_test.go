@@ -53,3 +53,57 @@ func TestUserSQLinject(t *testing.T) {
 		t.Error(err)
 	}
 }
+func TestEnableDisable(t *testing.T) {
+	_, err := insertUser("test")
+	if err != nil {
+		t.Error(err)
+	}
+	user, err := getUser("test")
+	if err != nil {
+		t.Error(err)
+	}
+	if user.Active != 1 {
+		t.Error("User not active after creation")
+	}
+	err = setActive("test", 0)
+	if err != nil {
+		t.Error(err)
+	}
+	user, err = getUser("test")
+	if user.Active != 0 {
+		t.Error("User active after disabling")
+	}
+	err = setActive("test", 1)
+	if err != nil {
+		t.Error(err)
+	}
+	user, err = getUser("test")
+	if user.Active != 1 {
+		t.Error("User not active after enabling")
+	}
+	err = deleteUser("test")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRenewKey(t *testing.T) {
+	old_key, err := insertUser("test")
+	if err != nil {
+		t.Error(err)
+	}
+	new_key, err := renewUserKey("test")
+	if err != nil {
+		t.Error(err)
+	}
+	if old_key == new_key {
+		t.Error("Old and new key are the same")
+	}
+	user, err := getUser("test")
+	if err != nil {
+		t.Error(err)
+	}
+	if user.AccessKey != new_key {
+		t.Error("Key is not changed")
+	}
+}

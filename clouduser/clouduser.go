@@ -20,7 +20,7 @@ func Make(username string) {
 	access_key, err := insertUser(username)
 	if err != nil {
 		log.Println(err)
-		os.Exit(1)
+		return
 	}
 	fmt.Println(username, access_key)
 }
@@ -29,7 +29,7 @@ func Show(username string) {
 	user, err := getUser(username)
 	if err != nil {
 		log.Println(err)
-		os.Exit(1)
+		return
 	}
 	fmt.Println(user)
 }
@@ -38,17 +38,27 @@ func Delete(username string) {
 	err := deleteUser(username)
 	if err != nil {
 		log.Println(err)
-		os.Exit(1)
+		return
 	}
 	fmt.Println("User deleted.")
 }
 
 func Suspend(username string) {
-	fmt.Println("suspend")
+	err := setActive(username, 0)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println("User suspended.")
+	}
 }
 
 func Enable(username string) {
-	fmt.Println("enable")
+	err := setActive(username, 1)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println("User enabled.")
+	}
 }
 
 func main() {
@@ -61,20 +71,15 @@ func main() {
 	switch os.Args[1] {
 	case "make":
 		Make(username)
-		os.Exit(0)
 	case "show":
 		Show(username)
-		os.Exit(0)
 	case "delete":
 		Delete(username)
-		os.Exit(0)
 	case "suspend":
 		Suspend(username)
-		os.Exit(0)
 	case "enable":
 		Enable(username)
-		os.Exit(0)
+	default:
+		Usage()
 	}
-	Usage()
-	os.Exit(1)
 }
