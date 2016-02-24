@@ -27,14 +27,34 @@ func main() {
 	case "make":
 		access_key, err := insertUser(username)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			return
 		}
 		fmt.Println(username, access_key)
+		return
 	case "show":
-		fmt.Println("show")
-	case "remove":
-		fmt.Println("delete")
+		user, err := getUser(username)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Println(user)
+		return
+	case "delete":
+		err := deleteUser(username)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Println("User deleted.")
+		return
 	case "suspend":
 		fmt.Println("suspend")
+		return
+	case "enable":
+		fmt.Println("enable")
+		return
 	}
+	usage()
+	return
 }
